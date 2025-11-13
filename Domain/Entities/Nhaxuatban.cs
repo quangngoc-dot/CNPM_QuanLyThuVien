@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+
+
 namespace Domain.Entities;
 
-
-public partial class Nhaxuatban
+public partial class NhaXuatBan
 {
-    public int Manxb { get; set; }
+    public int MaNxb { get; set; }
 
-    public string Tennxb { get; set; } = null!;
+    public string TenNxb { get; set; } = null!;
 
-    public string? Diachi { get; set; }
+    public string? DiaChi { get; set; }
 
-    public string? Sdt { get; set; }
+    public string? SoDienThoai { get; set; }
 
-    public string? Website { get; set; }
-
-    public virtual ICollection<Sach> Saches { get; set; } = new List<Sach>();
+    public virtual ICollection<TaiLieu> TaiLieus { get; set; } = new List<TaiLieu>();
 }

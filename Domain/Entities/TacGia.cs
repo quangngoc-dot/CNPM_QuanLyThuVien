@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 
+
 namespace Domain.Entities;
 
-public partial class Theloai
+public partial class TacGia
 {
-    public int MaTheLoai { get; set; }
+    public int MaTacGia { get; set; }
 
-    public string TenTheLoai { get; set; } = null!;
+    public string TenTacGia { get; set; } = null!;
 
     public virtual ICollection<TaiLieu> MaTaiLieus { get; set; } = new List<TaiLieu>();
 }

@@ -1,59 +1,60 @@
-﻿using AutoMapper;
-using BackEnd.DTOs;
+﻿using Application.Interfaces;
 using Domain.Entities;
-using Application.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BackEnd.Controllers
+namespace API.Controllers_V2
 {
-    [Route("api/[controller]")]
+    [Route("api")]
     [ApiController]
     public class DocGiaController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-        public DocGiaController(IMapper mapper, IUnitOfWork unitOfWork)
-        {
-            _mapper = mapper;
-            _unitOfWork = unitOfWork;
+        private readonly IDocGia _repo;
+        public DocGiaController(IDocGia docgia) { 
+            _repo = docgia;
         }
-        // lấy tất cả độc giả
-        [HttpGet("getall")]
-        public async Task<IActionResult> GetAll()
-        {
-            var docgias = await _unitOfWork.DocGias.GetAll();
-            return Ok(docgias);
+        [HttpGet("docgias")]
+        public async Task<IActionResult> GetALl() { 
+            var docgias=await _repo.GetDocGias();
+            return Ok(new
+            {
+                data = docgias
+            });
         }
-        // tạo độc giả
-        [HttpPost("create")]
-        public async Task<IActionResult> Create([FromBody] DocGiaDTO docGiaDTO)
+        [HttpGet("docgias/{id}")]
+        public async Task<IActionResult> GetByID(int id)
         {
-            if (docGiaDTO == null || docGiaDTO.Manguoidung == null)
+            DocGia docgia = await _repo.GetDocGia(id);
+            if (docgia == null)
             {
-                return BadRequest(new { error = "invalid" });
+                return NoContent();
             }
-            if (await _unitOfWork.DocGias.ExistNguoiDungID(docGiaDTO.Manguoidung.Value)
-                && !await _unitOfWork.NguoiDungs.ExistIDAsync(docGiaDTO.Manguoidung.Value))
+            return Ok(new
             {
-                return BadRequest(new { error = "Manguoidung not exists" });
-            }
-            Docgia docgia = _mapper.Map<Docgia>(docGiaDTO);
-            await _unitOfWork.DocGias.Create(docgia);
-            await _unitOfWork.CompleteAsync();
-            return Ok();
+                data = docgia
+            });
         }
-        // update độc giả
-        [HttpPatch("update")]
-        public async Task<IActionResult> Update([FromBody] DocGiaDTO docGiaDTO)
+        [HttpPost("docgias")]
+        public async Task<IActionResult> Create([FromBody] DocGia docgia)
         {
-            Docgia docgia = _mapper.Map<Docgia>(docGiaDTO);
-            bool kq = await _unitOfWork.DocGias.Update(docgia);
-            if (kq)
+            if (docgia != null)
             {
-                await _unitOfWork.CompleteAsync();
-                return Ok();
+                if (docgia.Email != null) {
+                    bool existEmail = await _repo.ExistEmail(docgia.Email);
+                    if (existEmail) {
+                        return BadRequest(new
+                        {
+                            error = "ishasemail"
+                        });
+                    }
+                }
+                await _repo.CreateDocGia(docgia);
+                return Created();
             }
-            return BadRequest();
+            else
+            {
+                return NotFound();
+            }
         }
     }
 }

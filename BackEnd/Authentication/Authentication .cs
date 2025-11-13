@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -27,6 +28,11 @@ namespace API.Authentication
 
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
+            var endpoint = Context.GetEndpoint();
+            if (endpoint?.Metadata?.GetMetadata<IAllowAnonymous>() != null)
+            {
+                return Task.FromResult(AuthenticateResult.NoResult());
+            }
             if (!Request.Headers.TryGetValue("Token", out var tokenSource))
             {
                 return Task.FromResult(AuthenticateResult.Fail("Missing Token header"));

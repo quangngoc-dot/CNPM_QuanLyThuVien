@@ -9,11 +9,7 @@ namespace API.Authentication
         {
             const string schemeName = CustomJwtAuthenticationOptions.SchemeName;
 
-            return services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = schemeName;
-                options.DefaultChallengeScheme = schemeName;
-            })
+            return services.AddAuthentication()
             .AddScheme<CustomJwtAuthenticationOptions, CustomJwtAuthenticationHandler>(
                 schemeName, options =>
                 {

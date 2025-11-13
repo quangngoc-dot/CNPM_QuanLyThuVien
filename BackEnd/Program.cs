@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using BackEnd.Middleware;
-using Domain.Entities;
-using Application.Interfaces;
-using Infrastructure.Repositories;
+using Infrastructure.Context;
 using Application.IServices;
 using API.Services;
 using API.Authentication;
+using Application.Interfaces;
+using Infrastructure.Repositories;
 namespace WebApplication1
 {
     public class Program
@@ -13,7 +13,6 @@ namespace WebApplication1
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            // Add cors policy
             builder.Services.AddCors(option =>
             {
                 option.AddPolicy("CORS", options =>
@@ -31,15 +30,22 @@ namespace WebApplication1
                 options.AddPolicy("User", policy => policy.RequireRole("Admin").RequireRole("User"));
             });
             builder.Services.AddSingleton<JwtTokenService>();
-            builder.Services.AddDbContext<QlThuvienContext>(options =>
+            builder.Services.AddDbContext<QuanlythuvienContext>(options =>
             {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("QL_THUVIEN"));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("QL_THUVIENV2"));
             });
-            builder.Services.AddScoped<ISachRepository, SachRepository>();
-            builder.Services.AddScoped<INguoiDungRepository, NguoiDungRepository>();
-            builder.Services.AddScoped<IYeuCauMuonRepository,YeuCauMuonRepository>();
-            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddMemoryCache();
+            //v1
             builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
+            //
+            //v2
+            builder.Services.AddScoped<ITaiLieuRepo,TaiLieuRepo>();
+            builder.Services.AddScoped<IDocGia,DocGiaRepo>();
+            builder.Services.AddScoped<INhanVien,NhanVienRepo>();
+            builder.Services.AddScoped<ITacGia_TheLoai_NXB,TacGia_TheLoai_NXB>();
+            //   
+
+
             builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
             builder.Services.AddControllers();
             builder.Services.AddHttpClient();

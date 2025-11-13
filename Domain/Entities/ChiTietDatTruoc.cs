@@ -3,17 +3,15 @@ using System.Collections.Generic;
 
 namespace Domain.Entities;
 
-public partial class ChiTietPhieuMuon
+public partial class ChiTietDatTruoc
 {
-    public int MaPhieuMuon { get; set; }
+    public int MaDatTruoc { get; set; }
 
     public int MaTaiLieu { get; set; }
 
     public int? SoLuong { get; set; }
 
-    public decimal? PhiMuonTaiThoiDiem { get; set; }
-
-    public virtual PhieuMuon MaPhieuMuonNavigation { get; set; } = null!;
+    public virtual DatMuonTruoc MaDatTruocNavigation { get; set; } = null!;
 
     public virtual TaiLieu MaTaiLieuNavigation { get; set; } = null!;
 }

@@ -1,17 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 
+
 namespace Domain.Entities;
 
-public partial class Nhanvien
+public partial class NhanVien
 {
-    public int Manhanvien { get; set; }
+    public int MaNv { get; set; }
 
-    public int? Manguoidung { get; set; }
+    public int MaDocGia { get; set; }
 
-    public string? Chucvu { get; set; }
+    public DateOnly? NgayVaoLam { get; set; }
 
-    public DateOnly? Ngayvaolam { get; set; }
+    public string? ChucVu { get; set; }
 
-    public virtual Nguoidung? ManguoidungNavigation { get; set; }
+    public virtual ICollection<DatMuonTruoc> DatMuonTruocs { get; set; } = new List<DatMuonTruoc>();
+
+    public virtual DocGia? MaDocGiaNavigation { get; set; } = null!;
+
+    public virtual ICollection<PhieuMuon> PhieuMuons { get; set; } = new List<PhieuMuon>();
+
+    public virtual ICollection<PhieuPhat> PhieuPhats { get; set; } = new List<PhieuPhat>();
+
+    public virtual ICollection<XuLyGiaHan> XuLyGiaHans { get; set; } = new List<XuLyGiaHan>();
 }

@@ -1,37 +1,41 @@
-﻿using AutoMapper;
-using API.DTOs;
-using Domain.Entities;
+﻿using API.DTOs;
 using Application.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 using Application.IServices;
+using AutoMapper;
+using Domain.Entities;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
-namespace BackEnd.Controllers
+namespace API.Controllers_V2
 {
-    [Route("auth")]
+    [Route("api")]
     [ApiController]
     public class AuthController : ControllerBase
     {
         private readonly JwtTokenService _generateJwtToken;
-        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IDocGia _docgiarepo;
         private readonly IGoogleAuthService _authService;
-        public AuthController(JwtTokenService generateJwtToken,IMapper mapper,IUnitOfWork unitOfWork,IGoogleAuthService googleAuthService )
-        {
-            _authService = googleAuthService;
+        public AuthController(JwtTokenService generateJwtToken,IMapper mapper,IDocGia docgia, IGoogleAuthService googleAuthService) { 
             _mapper = mapper;
+            _docgiarepo = docgia;
             _generateJwtToken = generateJwtToken;
-            _unitOfWork = unitOfWork;
+            _authService = googleAuthService;
         }
-        [Route("login")]
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] LoginDTo userLogin)
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginDTo userlogin)
         {
             string vaitro = "";
-            Nguoidung user = _mapper.Map<Nguoidung>(userLogin);
-            int isValidUser = await _unitOfWork.NguoiDungs.ExistNguoiDungAsync(user.Email!,user.Matkhau, vaitro);
+            DocGia user=_mapper.Map<DocGia>(userlogin);
+            if (userlogin.MatKhau == null || string.IsNullOrEmpty(userlogin.MatKhau) ||
+                user.Email == null || string.IsNullOrEmpty(userlogin.Email)) {
+                return BadRequest();
+            }
+
+            int isValidUser = await _docgiarepo.ExistDocGia(user.Email, user.MatKhau);
             if (isValidUser != -1)
             {
-                if (vaitro == "admin")
+                if (vaitro == "Thủ thư" || vaitro== "Quản lý")
                 {
                     var token = _generateJwtToken.Generate(isValidUser, user.Email!, "Admin");
                     return Ok(new { Token = token });
@@ -46,8 +50,22 @@ namespace BackEnd.Controllers
             {
                 token = ""
             });
-
         }
+        [Route("register")]
+        [HttpPost]
+        public async Task<IActionResult> Register([FromBody] RegisterDTO userRegister)
+        {
+            DocGia user = _mapper.Map<DocGia>(userRegister);
+            bool emailExists = await _docgiarepo.ExistEmail(user.Email!);
+            if (emailExists)
+            {
+                return Conflict();
+            }
+            await _docgiarepo.CreateDocGia(user);
+            return Ok();
+        }
+
+
         [HttpPost("google-login")]
         public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginDTO model)
         {
@@ -64,8 +82,7 @@ namespace BackEnd.Controllers
                 {
                     return Ok(new
                     {
-                        Message = "Login successful",
-                        Token = result.CustomJwtToken 
+                        Token = result.CustomJwtToken
                     });
                 }
                 else
@@ -77,24 +94,6 @@ namespace BackEnd.Controllers
             {
                 return StatusCode(500, new { Message = "An unexpected error occurred." });
             }
-        }
-
-        [Route("register")]
-        [HttpPost]
-        public async Task<IActionResult> Register([FromBody] RegisterDTO userRegister)
-        {
-            Console.WriteLine("");
-            Nguoidung user = _mapper.Map<Nguoidung>(userRegister);
-            bool result = await _unitOfWork.NguoiDungs.ExistIDAsync(user.Manguoidung);
-            bool emailExists = await _unitOfWork.NguoiDungs.ExistEmail(user.Email!);
-            if (result || emailExists)
-            {
-                return Conflict(new { error = "ishas" });
-            }
-            await _unitOfWork.NguoiDungs.AddAsync(user);
-
-            await _unitOfWork.CompleteAsync();
-            return Ok(new { message = "Đăng ký thành công." });
         }
     }
 }
