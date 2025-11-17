@@ -6,6 +6,7 @@ using API.Services;
 using API.Authentication;
 using Application.Interfaces;
 using Infrastructure.Repositories;
+using Domain.Entities;
 namespace WebApplication1
 {
     public class Program
@@ -40,9 +41,16 @@ namespace WebApplication1
             //
             //v2
             builder.Services.AddScoped<ITaiLieuRepo,TaiLieuRepo>();
-            builder.Services.AddScoped<IDocGia,DocGiaRepo>();
-            builder.Services.AddScoped<INhanVien,NhanVienRepo>();
-            builder.Services.AddScoped<ITacGia_TheLoai_NXB,TacGia_TheLoai_NXB>();
+            builder.Services.AddScoped<IDocGiaRepo,DocGiaRepo>();
+            builder.Services.AddScoped<INhanVienRepo,NhanVienRepo>();
+            builder.Services.AddScoped<ITacGia_TheLoai_NXBRepo,TacGia_TheLoai_NXB>();
+            builder.Services.AddScoped<ITheBanDocRepo,TheBanDocRepo>();
+            builder.Services.AddScoped<IPhieuMuonRepo,PhieuMuonRepo>();
+            builder.Services.AddScoped<IDanhGiaBinhLuanRepo,DanhGiaBinhLuanRepo>();
+            builder.Services.AddScoped<IPhieuPhatRepo,PhieuPhatRepo>();
+            builder.Services.AddScoped<IUnitOfWork,UnitOfWork>();
+            builder.Services.AddScoped<IDatMuonTruocRepo,DatMuonTruocRepo>();
+            builder.Services.AddScoped<IXuLyGiaHanRepo,XuLyGiaHanRepo>();
             //   
 
 

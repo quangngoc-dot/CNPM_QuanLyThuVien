@@ -10,12 +10,31 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories
 {
-    public class TacGia_TheLoai_NXB : ITacGia_TheLoai_NXB
+    public class TacGia_TheLoai_NXB : ITacGia_TheLoai_NXBRepo
     {
         private readonly QuanlythuvienContext _context;
         public TacGia_TheLoai_NXB(QuanlythuvienContext context) {
             _context = context;
         }
+
+        public async Task CreateNXB(NhaXuatBan nxb)
+        {
+            await _context.NhaXuatBans.AddAsync(nxb);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task CreateTacGia(TacGia tacGia)
+        {
+            await _context.TacGia.AddAsync(tacGia);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task CreateTheLoai(Theloai theloai)
+        {
+            await _context.Theloais.AddAsync(theloai);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<NhaXuatBan?> GetByIDNXB(int id)
         {
             return await _context.NhaXuatBans

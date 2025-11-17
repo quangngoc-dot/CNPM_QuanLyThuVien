@@ -2,6 +2,7 @@
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers_V2
@@ -10,93 +11,85 @@ namespace API.Controllers_V2
     [ApiController]
     public class TacGia_TheLoai_NXBController : ControllerBase
     {
-        private readonly ITacGia_TheLoai_NXB _repo;
-        public TacGia_TheLoai_NXBController(ITacGia_TheLoai_NXB repo)
+        private readonly IUnitOfWork _unitOfWork;
+        public TacGia_TheLoai_NXBController( IUnitOfWork unitOfWork)
         {
-            _repo = repo;
+            _unitOfWork = unitOfWork;
         }
         [HttpGet("theloais")]
         [AllowAnonymous]
         public async Task<IActionResult> Theloais() { 
-            List<Theloai> theloais= await _repo.GetTheloais();
-            if(theloais.Count == 0)
-            {
-                return NoContent();
-            }
-            return Ok(new
-            {
-                data = theloais
-            });
+            List<Theloai> theloais= await _unitOfWork.tacgia_theloai_NXBRepo.GetTheloais();
+            return Ok(theloais);
         }
         [HttpGet("tacgias")]
         [AllowAnonymous]
         public async Task<IActionResult> Tacgias()
         {
-            List<TacGia> tacgias = await _repo.GetTacGias();
-            if (tacgias.Count == 0)
-            {
-                return NoContent();
-            }
-            return Ok(new
-            {
-                data = tacgias
-            });
+            List<TacGia> tacgias = await _unitOfWork.tacgia_theloai_NXBRepo.GetTacGias();
+            return Ok(tacgias);
         }
         [HttpGet("nxbs")]
         [AllowAnonymous]
         public async Task<IActionResult> NXBs()
         {
-            List<NhaXuatBan> nxbs = await _repo.GetNhaXuatBans();
-            if (nxbs.Count == 0)
-            {
-                return NoContent();
-            }
-            return Ok(new
-            {
-                data = nxbs
-            });
+            List<NhaXuatBan> nxbs = await _unitOfWork.tacgia_theloai_NXBRepo.GetNhaXuatBans();
+            return Ok(nxbs);
         }
-        [HttpGet("nxbs/{id}")]
+        [HttpGet("nxb/{id}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetByNXBID(int id)
         {
-            NhaXuatBan? nxb = await _repo.GetByIDNXB(id);
-            if(nxb == null)
-            {
-                return NoContent();
-            }
-            return Ok(new
-            {
-                data = nxb
-            });
+            NhaXuatBan? nxb = await _unitOfWork.tacgia_theloai_NXBRepo.GetByIDNXB(id);
+            return Ok(nxb);
         }
-        [HttpGet("theloais/{id}")]
+        [HttpGet("theloai/{id}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetByTheLoaiID(int id)
         {
-            Theloai? theloai = await _repo.GetByIDTheLoai(id);
-            if (theloai == null)
-            {
-                return NoContent();
-            }
-            return Ok(new
-            {
-                data = theloai
-            });
+            Theloai? theloai = await _unitOfWork.tacgia_theloai_NXBRepo.GetByIDTheLoai(id);
+            return Ok(theloai);
         }
-        [HttpGet("tacgias/{id}")]
+        [HttpGet("tacgia/{id}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetByTacGiaID(int id)
         {
-            TacGia? tacgia = await _repo.GetByIDTacGia(id);
+            TacGia? tacgia = await _unitOfWork.tacgia_theloai_NXBRepo.GetByIDTacGia(id);
+            return Ok(tacgia);
+        }
+        [HttpPost("tacgia")]
+        public async Task<IActionResult> CreateTacGia([FromBody] TacGia tacgia)
+        {
             if (tacgia == null)
             {
-                return NoContent();
+                return BadRequest();
             }
-            return Ok(new
+            await _unitOfWork.tacgia_theloai_NXBRepo.CreateTacGia(tacgia);
+            return Created();
+        }
+        [HttpPost("nxb")]
+        public async Task<IActionResult> CreateNXB([FromBody] NhaXuatBan nxb)
+        {
+            if (nxb == null)
             {
-                data = tacgia
-            });
+                return BadRequest();
+            }
+            if (!string.IsNullOrEmpty(nxb.TenNxb))
+            {
+                return BadRequest();
+            }
+            await _unitOfWork.tacgia_theloai_NXBRepo.CreateNXB(nxb);
+            return Created();
+        }
+        [HttpPost("theloai")]
+        public async Task<IActionResult> CreateTheLoai([FromBody] Theloai theloai)
+        {
+            if(theloai == null)
+            {
+                return BadRequest();
+            }
+            await _unitOfWork.tacgia_theloai_NXBRepo.CreateTheLoai(theloai);
+            return Created();
         }
     }
 }

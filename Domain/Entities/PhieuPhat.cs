@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 
 namespace Domain.Entities;
@@ -19,8 +20,8 @@ public partial class PhieuPhat
     public DateTime? NgayLap { get; set; }
 
     public bool? TrangThaiThanhToan { get; set; }
-
-    public virtual NhanVien MaNvNavigation { get; set; } = null!;
-
-    public virtual PhieuMuon MaPhieuMuonNavigation { get; set; } = null!;
+    [JsonIgnore]
+    public virtual NhanVien? MaNvNavigation { get; set; } = null!;
+    [JsonIgnore]
+    public virtual PhieuMuon? MaPhieuMuonNavigation { get; set; } = null!;
 }

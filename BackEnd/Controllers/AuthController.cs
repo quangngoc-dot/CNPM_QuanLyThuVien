@@ -14,9 +14,9 @@ namespace API.Controllers_V2
     {
         private readonly JwtTokenService _generateJwtToken;
         private readonly IMapper _mapper;
-        private readonly IDocGia _docgiarepo;
+        private readonly IDocGiaRepo _docgiarepo;
         private readonly IGoogleAuthService _authService;
-        public AuthController(JwtTokenService generateJwtToken,IMapper mapper,IDocGia docgia, IGoogleAuthService googleAuthService) { 
+        public AuthController(JwtTokenService generateJwtToken,IMapper mapper,IDocGiaRepo docgia, IGoogleAuthService googleAuthService) { 
             _mapper = mapper;
             _docgiarepo = docgia;
             _generateJwtToken = generateJwtToken;
@@ -29,27 +29,32 @@ namespace API.Controllers_V2
             DocGia user=_mapper.Map<DocGia>(userlogin);
             if (userlogin.MatKhau == null || string.IsNullOrEmpty(userlogin.MatKhau) ||
                 user.Email == null || string.IsNullOrEmpty(userlogin.Email)) {
-                return BadRequest();
+                return NotFound();
             }
 
-            int isValidUser = await _docgiarepo.ExistDocGia(user.Email, user.MatKhau);
-            if (isValidUser != -1)
+            DocGia? isValidUser = await _docgiarepo.ExistDocGia(user.Email, user.MatKhau);
+            if (isValidUser != null)
             {
                 if (vaitro == "Thủ thư" || vaitro== "Quản lý")
                 {
-                    var token = _generateJwtToken.Generate(isValidUser, user.Email!, "Admin");
-                    return Ok(new { Token = token });
+                    var token = _generateJwtToken.Generate(isValidUser.MaDocGia, user.Email!, "Admin");
+                    return Ok(new
+                    {
+                        Token = token,
+                        user = isValidUser
+                    });
                 }
                 else
                 {
-                    var token = _generateJwtToken.Generate(isValidUser, user.Email!, "User");
-                    return Ok(new { Token = token });
+                    var token = _generateJwtToken.Generate(isValidUser.MaDocGia, user.Email!, "User");
+                    return Ok(new
+                    {
+                        Token = token,
+                        user = isValidUser
+                    });
                 }
             }
-            return NotFound(new
-            {
-                token = ""
-            });
+            return NotFound();
         }
         [Route("register")]
         [HttpPost]
@@ -62,7 +67,7 @@ namespace API.Controllers_V2
                 return Conflict();
             }
             await _docgiarepo.CreateDocGia(user);
-            return Ok();
+            return Created();
         }
 
 

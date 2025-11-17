@@ -12,6 +12,106 @@ namespace Infrastructure.Repositories
             _context = context;
         }
 
+        public async Task Create(TaiLieu tailieu, List<int> tacgia, List<int> theloai)
+        {
+            await _context.TaiLieus.AddAsync(tailieu);
+            await _context.SaveChangesAsync();
+
+            List<TacGia> tacgias = await _context.TacGia
+                .Where(t => tacgia.Contains(t.MaTacGia))
+                .ToListAsync();
+            if (tacgias.Count != tacgia.Count)
+            {
+                throw new ArgumentNullException();
+            }
+
+            foreach (var tg in tacgias)
+            {
+                tailieu.MaTacGia.Add(tg);
+            }
+            List<Theloai> theloais = await _context.Theloais
+                .Where(t => theloai.Contains(t.MaTheLoai))
+                .ToListAsync();
+            if (theloais.Count != theloai.Count)
+            {
+                throw new ArgumentNullException();
+            }
+
+            foreach (var tl in theloais)
+            {
+                tailieu.MaTheLoais.Add(tl);
+            }
+            await _context.SaveChangesAsync();
+
+        }
+
+        public async Task<bool> ExistID(int id)
+        {
+            return await _context.TaiLieus.AnyAsync(e => e.MaTaiLieu == id);
+        }
+
+        public async Task<bool> ExistNXB(int id)
+        {
+            return await _context.NhaXuatBans.AnyAsync(e=>e.MaNxb == id);
+        }
+
+        public async Task<bool> ExistTacGia(int id)
+        {
+            return await _context.TacGia.AnyAsync(e=>e.MaTacGia == id);
+        }
+
+        public async Task<bool> ExistTheLoai(int id)
+        {
+            return await _context.Theloais.AnyAsync(e=>e.MaTheLoai == id);
+        }
+
+        public async Task<List<TaiLieu>> GetAdvanced(TaiLieu tailieu)
+        {
+            IQueryable<TaiLieu> query = _context.TaiLieus.AsQueryable();
+
+            if (tailieu.MaTaiLieu != 0)
+                query = query.Where(x => x.MaTaiLieu == tailieu.MaTaiLieu);
+
+            if (!string.IsNullOrEmpty(tailieu.TenSach))
+                query = query.Where(x => x.TenSach.Contains(tailieu.TenSach));
+
+            if (!string.IsNullOrEmpty(tailieu.NgonNgu))
+                query = query.Where(x => x.NgonNgu == tailieu.NgonNgu);
+
+            if (tailieu.GiaBan != null)
+                query = query.Where(x => x.GiaBan == tailieu.GiaBan);
+
+            if (tailieu.PhiMuon != null)
+                query = query.Where(x => x.PhiMuon == tailieu.PhiMuon);
+
+            if (tailieu.NamXuatBan != null)
+                query = query.Where(x => x.NamXuatBan == tailieu.NamXuatBan);
+
+            if (tailieu.MaNxb != null)
+                query = query.Where(x => x.MaNxb == tailieu.MaNxb);
+
+            if (tailieu.SoLuong != null)
+                query = query.Where(x => x.SoLuong == tailieu.SoLuong);
+
+            if (tailieu.SoLuongCon != null)
+                query = query.Where(x => x.SoLuongCon == tailieu.SoLuongCon);
+
+            if (!string.IsNullOrEmpty(tailieu.AnhBia))
+                query = query.Where(x => x.AnhBia == tailieu.AnhBia);
+
+             return await query.ToListAsync();
+        }
+
+        public async Task<TaiLieu?> GetByID(int id)
+        {
+            return await _context.TaiLieus.FirstOrDefaultAsync(e => e.MaTaiLieu == id);
+        }
+
+        public async Task<List<TaiLieu>> GetByName(string name)
+        {
+            return await _context.TaiLieus.AsNoTracking().Where(e=>e.TenSach.Contains(name)).ToListAsync();
+        }
+
         public async Task<List<TaiLieu>> GetByNXB(int id)
         {
             var nxb = await _context.NhaXuatBans
@@ -95,7 +195,12 @@ namespace Infrastructure.Repositories
 
         public async Task<List<TaiLieu>> GetTaiLieus()
         {
-            return await _context.TaiLieus.AsNoTracking().ToListAsync();
+            return await _context.TaiLieus.AsNoTracking()
+                .Include(e => e.MaTacGia)
+                .Include(e => e.MaTheLoais)
+                .Include(e => e.MaNxbNavigation)
+                .Include(e => e.DanhGiaBinhLuans)
+                .ToListAsync();
         }
     }
 }

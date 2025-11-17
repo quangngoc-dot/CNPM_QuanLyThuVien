@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories
 {
-    public class NhanVienRepo : INhanVien
+    public class NhanVienRepo : INhanVienRepo
     {
         QuanlythuvienContext _context;
         public NhanVienRepo(QuanlythuvienContext context)
@@ -59,5 +59,12 @@ namespace Infrastructure.Repositories
         {
             return await _context.DocGia.AnyAsync(e=>e.MaDocGia==id);
         }
+
+        public async Task<bool> ExistNhanVien(int id)
+        {
+
+            return await _context.NhanViens.AnyAsync(e => e.MaNv == id);
+        }
+        
     }
 }

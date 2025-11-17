@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using API.DTOs;
+using Application.Interfaces;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,51 +10,85 @@ namespace API.Controllers_V2
     [ApiController]
     public class DocGiaController : ControllerBase
     {
-        private readonly IDocGia _repo;
-        public DocGiaController(IDocGia docgia) { 
-            _repo = docgia;
+        private readonly IUnitOfWork _unitOfWork;
+        public DocGiaController(IUnitOfWork unitofwork) { 
+            _unitOfWork= unitofwork;
         }
         [HttpGet("docgias")]
-        public async Task<IActionResult> GetALl() { 
-            var docgias=await _repo.GetDocGias();
-            return Ok(new
-            {
-                data = docgias
-            });
+        public async Task<IActionResult> GetALL() { 
+            var docgias=await _unitOfWork.docgiarepo.GetDocGias();
+            return Ok(docgias);
         }
-        [HttpGet("docgias/{id}")]
+        [HttpGet("docgia/{id}")]
         public async Task<IActionResult> GetByID(int id)
         {
-            DocGia docgia = await _repo.GetDocGia(id);
-            if (docgia == null)
+            DocGia? docgia = await _unitOfWork.docgiarepo.GetDocGia(id);
+            if(docgia == null)
             {
-                return NoContent();
+                return NotFound();
             }
-            return Ok(new
-            {
-                data = docgia
-            });
-        }
-        [HttpPost("docgias")]
+            return Ok(docgia);
+        }   
+        [HttpPost("docgia")]
         public async Task<IActionResult> Create([FromBody] DocGia docgia)
         {
             if (docgia != null)
             {
                 if (docgia.Email != null) {
-                    bool existEmail = await _repo.ExistEmail(docgia.Email);
+                    bool existEmail = await _unitOfWork.docgiarepo.ExistEmail(docgia.Email);
                     if (existEmail) {
                         return BadRequest(new
                         {
-                            error = "ishasemail"
+                            error = "email"
                         });
                     }
                 }
-                await _repo.CreateDocGia(docgia);
+                await _unitOfWork.docgiarepo.CreateDocGia(docgia);
                 return Created();
             }
             else
             {
                 return NotFound();
+            }
+        }
+        [HttpPatch("docgia")]
+        public async Task<IActionResult> UpdateDocGia(UpdateDocGia docgia)
+        {
+            DocGia? ishasdocgia = await _unitOfWork.docgiarepo.GetDocGia(docgia.docgia.MaDocGia);
+            if (ishasdocgia == null)
+            {
+                return NotFound();
+            }
+            if (ishasdocgia.Email == docgia.docgia.Email)
+            {
+                docgia.docgia.Email = null;
+            }
+            if (docgia.docgia.Email != null || !string.IsNullOrWhiteSpace(docgia.docgia.Email))
+            {
+                bool ishasemail = await _unitOfWork.docgiarepo.ExistEmail(docgia.docgia.Email);
+                if (ishasemail)
+                {
+                    return BadRequest(new
+                    {
+                        error = "email"
+                    });
+                }
+            }
+            if (docgia.matkhaucu != ishasdocgia.MatKhau)
+            {
+                return BadRequest(new
+                {
+                    error = "matkhau"
+                });
+            }
+            bool result = await _unitOfWork.docgiarepo.UpdateDocGia(docgia.docgia);
+            if (result)
+            {
+                return NoContent();
+            }
+            else
+            {
+                return BadRequest();
             }
         }
     }

@@ -7,5 +7,14 @@ namespace Application.Interfaces
         public Task<List<TaiLieu>> GetByTacGia(int id);
         public Task<List<TaiLieu>> GetByTheLoai(int id);
         public Task<List<TaiLieu>> GetByNXB(int id);
+        public Task<bool> ExistID(int id);
+        public Task<List<TaiLieu>> GetByName(string name);
+        public Task<List<TaiLieu>> GetAdvanced(TaiLieu tailieu);
+        public Task<TaiLieu?> GetByID(int id);
+        public Task Create(TaiLieu tailieu, List<int> tacgia, List<int> theloai);
+        public Task<bool> ExistNXB(int id);
+        public Task<bool> ExistTacGia(int id);
+        public Task<bool> ExistTheLoai(int id);
     }
+
 }

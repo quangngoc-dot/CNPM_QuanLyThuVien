@@ -18,9 +18,9 @@ public partial class DatMuonTruoc
 
     public int? MaNvduyet { get; set; }
 
-    public virtual ICollection<ChiTietDatTruoc> ChiTietDatTruocs { get; set; } = new List<ChiTietDatTruoc>();
+    public virtual ICollection<ChiTietDatTruoc>? ChiTietDatTruocs { get; set; } = new List<ChiTietDatTruoc>();
 
-    public virtual DocGia MaDocGiaNavigation { get; set; } = null!;
+    public virtual DocGia? MaDocGiaNavigation { get; set; } = null!;
 
     public virtual NhanVien? MaNvduyetNavigation { get; set; }
 }

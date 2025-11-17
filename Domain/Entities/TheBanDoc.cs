@@ -15,7 +15,7 @@ public partial class TheBanDoc
 
     public DateOnly? NgayHetHan { get; set; }
 
-    public virtual DocGia MaDocGiaNavigation { get; set; } = null!;
+    public virtual DocGia? MaDocGiaNavigation { get; set; } = null!;
 
     public virtual ICollection<PhieuMuon> PhieuMuons { get; set; } = new List<PhieuMuon>();
 }

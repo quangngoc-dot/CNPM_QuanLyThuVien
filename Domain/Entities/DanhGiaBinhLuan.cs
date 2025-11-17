@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Domain.Entities;
 
@@ -16,8 +17,8 @@ public partial class DanhGiaBinhLuan
     public string? BinhLuan { get; set; }
 
     public DateTime? NgayDanhGia { get; set; }
-
-    public virtual DocGia MaDocGiaNavigation { get; set; } = null!;
-
-    public virtual TaiLieu MaTaiLieuNavigation { get; set; } = null!;
+    [JsonIgnore]
+    public virtual DocGia? MaDocGiaNavigation { get; set; } = null!;
+    [JsonIgnore]
+    public virtual TaiLieu? MaTaiLieuNavigation { get; set; } = null!;
 }

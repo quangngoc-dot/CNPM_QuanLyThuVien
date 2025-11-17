@@ -7,11 +7,12 @@ using System.Threading.Tasks;
 
 namespace Application.Interfaces
 {
-    public interface INhanVien
+    public interface INhanVienRepo
     {
         public Task<List<NhanVien>> GetAll();
         public Task<NhanVien?> GetNhanVien(int id);
         public Task CreateNhanVien(NhanVien nhanVien);
         public Task<bool> ExistDocGia(int id);
+        public Task<bool> ExistNhanVien(int id);
     }
 }

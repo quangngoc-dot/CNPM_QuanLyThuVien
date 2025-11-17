@@ -22,11 +22,11 @@ public partial class PhieuMuon
 
     public string? TrangThai { get; set; }
 
-    public virtual ICollection<ChiTietPhieuMuon> ChiTietPhieuMuons { get; set; } = new List<ChiTietPhieuMuon>();
+    public virtual ICollection<ChiTietPhieuMuon>? ChiTietPhieuMuons { get; set; } = new List<ChiTietPhieuMuon>();
 
-    public virtual NhanVien MaNvNavigation { get; set; } = null!;
+    public virtual NhanVien? MaNvNavigation { get; set; } = null!;
 
-    public virtual TheBanDoc MaSoTheNavigation { get; set; } = null!;
+    public virtual TheBanDoc? MaSoTheNavigation { get; set; } = null!;
 
     public virtual ICollection<PhieuPhat> PhieuPhats { get; set; } = new List<PhieuPhat>();
 
